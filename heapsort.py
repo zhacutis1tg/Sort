@@ -28,9 +28,11 @@ def heap_sort(arr):
 
 def main():
     data = np.load('data.npz')
+    keys = data.files
+    
+    times = np.zeros(len(keys)) 
 
-    times = []
-    for key in data.files:
+    for i, key in enumerate(keys):
         arr = data[key].copy()
         
         start = time.perf_counter()
@@ -38,12 +40,13 @@ def main():
         end = time.perf_counter()
         
         ms = (end - start) * 1000
-        times.append(ms)
+        times[i] = ms
         print(f"{key:<15} | {ms:>12.2f} ms")
 
-    avg_time = sum(times) / len(times)
+    avg_time = np.mean(times) 
     print("-" * 35)
     print(f"{'Trung bình':<15} | {avg_time:>12.2f} ms")
 
 if __name__ == "__main__":
+
     main()
