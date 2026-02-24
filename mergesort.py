@@ -7,44 +7,51 @@ def merge_sort(arr):
     
     mid = len(arr) // 2
     
-    left_half = merge_sort(arr[:mid])
-    right_half = merge_sort(arr[mid:])
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
     
-    return merge(left_half, right_half)
+    return merge(left, right)
 
 def merge(left, right):
-    sorted_arr = []
-    i = j = 0
+    sorted_arr = np.empty(len(left) + len(right), dtype=left.dtype)
+    
+    i = j = k = 0
     
     while i < len(left) and j < len(right):
         if left[i] < right[j]:
-            sorted_arr.append(left[i])
+            sorted_arr[k] = left[i]
             i += 1
         else:
-            sorted_arr.append(right[j])
+            sorted_arr[k] = right[j]
             j += 1
+            
+        k += 1
     
-    sorted_arr.extend(left[i:])
-    sorted_arr.extend(right[j:])
+    if i < len(left):
+        sorted_arr[k:] = left[i:]
+    if j < len(right):
+        sorted_arr[k:] = right[j:]
     
     return sorted_arr
 
 def main():
     data = np.load('data.npz')
-
-    times = []
-    for key in data.files:
-        arr = data[key].tolist()
+    keys = data.files
+    
+    times = np.zeros(len(keys))
+    
+    for idx, key in enumerate(keys):
+        arr = data[key]
         
         start = time.perf_counter()
         sorted_arr = merge_sort(arr)
         end = time.perf_counter()
         
         ms = (end - start) * 1000
-        times.append(ms)
+        times[idx] = ms
         print(f"{key:<15} | {ms:>12.2f} ms")
 
-    avg_time = sum(times) / len(times)
+    avg_time = np.mean(times)
     print("-" * 35)
     print(f"{'Trung bình':<15} | {avg_time:>12.2f} ms")
 
